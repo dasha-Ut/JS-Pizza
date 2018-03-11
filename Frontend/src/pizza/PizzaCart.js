@@ -2,6 +2,7 @@
  * Created by chaika on 02.02.16.
  */
 var Templates = require('../Templates');
+var Storage = require('../LocalStorage');
 
 //Перелік розмірів піци
 var PizzaSize = {
@@ -13,26 +14,50 @@ var PizzaSize = {
 var Cart = [];
 
 //HTML едемент куди будуть додаватися піци
-var $cart = $("#cart");
+var $cart = $("#orderOne");
+
+var total = 0;
+var numberOfOrders = 0;
 
 function addToCart(pizza, size) {
     //Додавання однієї піци в кошик покупок
-
     //Приклад реалізації, можна робити будь-яким іншим способом
-    Cart.push({
-        pizza: pizza,
-        size: size,
-        quantity: 1
-    });
-
-    //Оновити вміст кошика на сторінці
+    function samePizza(obj) {
+        return obj.pizza.id === pizza.id && obj.size === size;
+    }
+    var same = Cart.filter(samePizza);
+    if (same.length > 0) {
+        same[0].quantity++;
+    } else {
+        Cart.push({
+            pizza: pizza,
+            size: size,
+            quantity: 1
+        });
+        numberOfOrders++;
+        updateOrderNumber();
+    }
+    // Оновлюємо суму
+    total += pizza[size].price;
+    updateTotalSum();
     updateCart();
+
 }
+
+function updateTotalSum(){
+    $("#total").html(total);
+    Storage.set("total",total);
+}
+
+function updateOrderNumber(){
+    $(".amount_of_orders").html(numberOfOrders);
+    Storage.set("numberOfOrders",numberOfOrders);
+}
+
 
 function removeFromCart(cart_item) {
     //Видалити піцу з кошика
-    //TODO: треба зробити
-
+    Cart.splice(Cart.indexOf(cart_item), 1);
     //Після видалення оновити відображення
     updateCart();
 }
@@ -40,9 +65,16 @@ function removeFromCart(cart_item) {
 function initialiseCart() {
     //Фукнція віпрацьвуватиме при завантаженні сторінки
     //Тут можна наприклад, зчитати вміст корзини який збережено в Local Storage то показати його
-    //TODO: ...
-
+    var saved = Storage.get("cart");
+    if (saved) {
+        Cart = saved;
+        total = Storage.get("total");
+        updateTotalSum();
+        numberOfOrders = Storage.get("numberOfOrders");
+        updateOrderNumber();
+    }
     updateCart();
+
 }
 
 function getPizzaInCart() {
@@ -63,20 +95,78 @@ function updateCart() {
 
         var $node = $(html_code);
 
-        $node.find(".plus").click(function(){
+        $node.find(".plus").click(function () {
             //Збільшуємо кількість замовлених піц
             cart_item.quantity += 1;
+            total += cart_item.pizza[cart_item.size].price;
 
             //Оновлюємо відображення
             updateCart();
+            updateTotalSum();
+
+        });
+
+        $node.find(".minus").click(function () {
+            //Зменшуємо
+            if (cart_item.quantity == 1) {
+                removeFromCart(cart_item);
+                numberOfOrders--;
+                updateOrderNumber();
+            }
+            cart_item.quantity -= 1;
+            total -= cart_item.pizza[cart_item.size].price;
+            //Оновлюємо відображення
+            updateCart();
+            updateTotalSum();
+        });
+        $node.find(".delete").click(function () {
+            removeFromCart(cart_item);
+            total -= cart_item.pizza[cart_item.size].price * cart_item.quantity;
+            numberOfOrders--;
+            updateOrderNumber();
+            updateTotalSum();
+            //Оновлюємо відображення
+            updateCart();
+            updateTotal();
         });
 
         $cart.append($node);
+
     }
 
     Cart.forEach(showOnePizzaInCart);
-
+    Storage.set("cart", Cart);
+    if (Cart.length === 0) {
+        $("#orderButt").attr("disabled", "disabled");
+    } else {
+        $("#orderButt").removeAttr("disabled");
+    }
 }
+    $("#clear").click(function () {
+        clear();
+    });
+
+    function clear(){
+        Cart = [];
+        updateCart();
+        total= 0;
+        updateTotalSum();
+        numberOfOrders = 0;
+        updateOrderNumber();
+    }
+
+
+    $("#orderButt").click(function () {
+        if(Cart.length !== 0){
+            location.href="/order.html";
+        }
+    });
+
+    $("#editButt").click(function () {
+        if(Cart.length !== 0){
+            location.href="/";
+        }
+    });
 
 exports.removeFromCart = removeFromCart;
 exports.addToCart = addToCart;
@@ -85,3 +175,5 @@ exports.getPizzaInCart = getPizzaInCart;
 exports.initialiseCart = initialiseCart;
 
 exports.PizzaSize = PizzaSize;
+exports.getPizzaInCart = getPizzaInCart;
+//exports.clear = clear;

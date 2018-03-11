@@ -1,0 +1,143 @@
+
+#top{
+  background-color: rgba(11, 11, 11, 0.83);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  padding-left: 114px;
+  right: @CartWidth;
+  height: @NavigationHeight;
+  min-width: @CartWidth;
+
+.flag {
+  cursor: pointer;
+  position: fixed;
+  left: @FlagLeft;
+  background-color: #EA862E;
+  width: @FlagWidth;
+  height: @NavigationHeight;
+  padding-top: 10px;
+  z-index: 2;
+  color: white;
+  text-align: center;
+  .pizza_on_flag {
+    font-size: 16px;
+  }
+
+  .kma {
+    font-size: 22px;
+  }
+}
+
+}
+.flagDown{
+  position: fixed;
+  top: @NavigationHeight - 15px;
+  left: @FlagLeft;
+  width: @FlagWidth;
+  height: @NavigationHeight;
+  transform: rotate(180deg);
+
+}
+
+.top_panelLine{
+  height: @NavigationHeight /2;
+  margin-top: 3.3px;
+  margin-right: 20px;
+  border-bottom: solid 1px rgba(251, 251, 251, 0.6);
+  color: rgba(255, 255, 255, 0.6);
+  .phone{
+    text-decoration: none;
+    display: inline-block;
+    vertical-align: sub;
+    color: rgba(249, 249, 249, 0.6);
+  }
+
+  .worktime{
+    vertical-align: sub;
+    display: inline-block;
+    font-size: 11px;
+    margin-left: 22px;
+  }@media (max-width: 767px) {
+  .worktime {
+    display: none;
+  }
+}
+
+}
+
+
+
+.freedeliver{
+  vertical-align: sub;
+  display: inline-block;
+  font-size: 13px;
+  margin-left: 22px;
+}
+
+.enter{
+  float: right;
+  padding: 2px 9px 2px 9px;
+}
+
+@media (max-width: 991px) {
+  .freedeliver {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .pizza {
+    display: none;
+  }
+}
+
+
+
+.footer{
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width:100%;
+  background: #f6f6f6;
+  box-shadow: 0px -1px 1px rgba(214, 214, 214, 0.75);
+  text-align: center;
+  color: rgba(143, 143, 143, 0.91);
+  padding-top: 25px;
+  padding-bottom: 24px;
+  p {
+    margin: 10px;
+  }
+}
+
+.badgeDiscount{
+  @HeightBadge:100px;
+  color: white;
+  z-index: 3;
+  position: fixed;
+  bottom: 0;
+  height: @HeightBadge;
+  width: 9px+@FlagWidth;
+  text-align: center;
+  left: @FlagLeft;
+  background-color: #e8852e;
+
+  .text{
+    padding: 4px;
+    border-bottom: dashed 2px #b86a24;
+  }
+  .discount{
+    font-weight: bold;
+    padding: 4px;
+  }
+  img {
+    height: 20px;
+    position: fixed;
+    z-index: 2;
+    bottom: @HeightBadge - 4px;
+    width: @FlagWidth + 9px;
+    left: @FlagLeft;
+  }
+}
