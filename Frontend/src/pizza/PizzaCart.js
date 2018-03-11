@@ -2,7 +2,7 @@
  * Created by chaika on 02.02.16.
  */
 var Templates = require('../Templates');
-var Storage = require('../LocalStorage');
+var Storage = window.localStorage;
 
 //Перелік розмірів піци
 var PizzaSize = {
@@ -46,12 +46,12 @@ function addToCart(pizza, size) {
 
 function updateTotalSum(){
     $("#total").html(total);
-    Storage.set("total",total);
+    Storage.setItem("total",total);
 }
 
 function updateOrderNumber(){
     $(".amount_of_orders").html(numberOfOrders);
-    Storage.set("numberOfOrders",numberOfOrders);
+    Storage.setItem("numberOfOrders",numberOfOrders);
 }
 
 
@@ -65,12 +65,12 @@ function removeFromCart(cart_item) {
 function initialiseCart() {
     //Фукнція віпрацьвуватиме при завантаженні сторінки
     //Тут можна наприклад, зчитати вміст корзини який збережено в Local Storage то показати його
-    var saved = Storage.get("cart");
+    var saved = Storage.getItem("cart");
     if (saved) {
         Cart = saved;
-        total = Storage.get("total");
+        total = Storage.getItem("total");
         updateTotalSum();
-        numberOfOrders = Storage.get("numberOfOrders");
+        numberOfOrders = Storage.getItem("numberOfOrders");
         updateOrderNumber();
     }
     updateCart();
@@ -135,7 +135,7 @@ function updateCart() {
     }
 
     Cart.forEach(showOnePizzaInCart);
-    Storage.set("cart", Cart);
+    Storage.setItem("cart", Cart);
     if (Cart.length === 0) {
         $("#orderButt").attr("disabled", "disabled");
     } else {
