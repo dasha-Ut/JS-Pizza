@@ -223,7 +223,7 @@ var Cart = [];
 //HTML едемент куди будуть додаватися піци
 var $cart = $("#orderOne");
 
-var total = 0;
+var totalBuy = 0;
 var numberOfOrders = 0;
 
 function addToCart(pizza, size) {
@@ -245,15 +245,15 @@ function addToCart(pizza, size) {
         updateOrderNumber();
     }
     // Оновлюємо суму
-    total += pizza[size].price;
+    totalBuy += pizza[size].price;
     updateTotalSum();
     updateCart();
 
 }
 
 function updateTotalSum(){
-    $("#total").html(total);
-    Storage.setItem("total",total);
+    $("#totalBuy").html(totalBuy);
+    Storage.setItem("totalBuy",totalBuy);
 }
 
 function updateOrderNumber(){
@@ -275,7 +275,7 @@ function initialiseCart() {
     var saved = Storage.getItem("cart");
     if (saved) {
         Cart = saved;
-        total = Storage.getItem("total");
+        totalBuy = Storage.getItem("total");
         updateTotalSum();
         numberOfOrders = Storage.getItem("numberOfOrders");
         updateOrderNumber();
@@ -305,7 +305,7 @@ function updateCart() {
         $node.find(".plus").click(function () {
             //Збільшуємо кількість замовлених піц
             cart_item.quantity += 1;
-            total += cart_item.pizza[cart_item.size].price;
+            totalBuy += cart_item.pizza[cart_item.size].price;
 
             //Оновлюємо відображення
             updateCart();
@@ -321,14 +321,14 @@ function updateCart() {
                 updateOrderNumber();
             }
             cart_item.quantity -= 1;
-            total -= cart_item.pizza[cart_item.size].price;
+            totalBuy -= cart_item.pizza[cart_item.size].price;
             //Оновлюємо відображення
             updateCart();
             updateTotalSum();
         });
         $node.find(".delete").click(function () {
             removeFromCart(cart_item);
-            total -= cart_item.pizza[cart_item.size].price * cart_item.quantity;
+            totalBuy -= cart_item.pizza[cart_item.size].price * cart_item.quantity;
             numberOfOrders--;
             updateOrderNumber();
             updateTotalSum();
@@ -356,7 +356,7 @@ function updateCart() {
     function clear(){
         Cart = [];
         updateCart();
-        total= 0;
+        totalBuy= 0;
         updateTotalSum();
         numberOfOrders = 0;
         updateOrderNumber();
