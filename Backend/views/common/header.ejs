@@ -2,7 +2,7 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <title>Pizza</title>
+    <title><%= pageTitle %> - Pizza</title>
 
     <!-- Bootsrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
@@ -12,6 +12,13 @@
     <!-- LESS JavaScript компілятор -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/2.5.3/less.min.js"></script>
 
+    <!-- Google Maps -->
+    <script	type="text/javascript"
+               src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDoRx20tkE4hGh-Js4FncBc5MaE11zuLZ8">
+    </script>
+
+
+
 
 </head>
 <body>
@@ -19,7 +26,8 @@
 
 
 <div id="top">
-    <div class="flag">
+    <div class="flag"onclick="location.href='/'">
+
         <div class="pizza_on_flag">PIZZA</div>
         <div class="kma">KMA</div>
     </div>

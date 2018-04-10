@@ -2,7 +2,7 @@
  * Created by chaika on 02.02.16.
  */
 var Templates = require('../Templates');
-var Storage = window.localStorage;
+var Storage =window.localStorage;
 
 //Перелік розмірів піци
 var PizzaSize = {
@@ -98,6 +98,7 @@ function updateCart() {
         $node.find(".plus").click(function () {
             //Збільшуємо кількість замовлених піц
             cart_item.quantity += 1;
+
             totalBuy += cart_item.pizza[cart_item.size].price;
 
             //Оновлюємо відображення
@@ -111,6 +112,7 @@ function updateCart() {
             if (cart_item.quantity == 1) {
                 removeFromCart(cart_item);
                 numberOfOrders--;
+
                 updateOrderNumber();
             }
             cart_item.quantity -= 1;
