@@ -25,8 +25,8 @@ module.exports = function(grunt) {
                 src:        'Frontend/src/main.js',
                 dest:       'Frontend/www/assets/js/main.js'
             }
+            }
         }
-    };
 
     //Налаштування відстежування змін в проекті
     var watchDebug = {

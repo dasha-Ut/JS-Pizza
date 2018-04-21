@@ -3,8 +3,14 @@
  */
 var Templates = require('../Templates');
 var PizzaCart = require('./PizzaCart');
-var Pizza_List = require('../Pizza_List');
+var Pizza_List = null;
 var API = require('../API');
+
+API.getPizzaList(function(error, data){
+    if(error)alert(error);
+    else Pizza_List=data;
+    initialiseMenu();
+});
 
 //HTML едемент куди будуть додаватися піци
 var $pizza_list = $("#pizza_list");
@@ -90,22 +96,15 @@ $(".pizza-type").click(function () {
 
 
 
-
-
 function filterPizza(filter) {
     //Масив куди потраплять піци які треба показати
    if(filter){
     var pizza_shown = Pizza_List.filter(filter);
-
-  //  Pizza_List.forEach(function(pizza){
-        //Якщо піка відповідає фільтру
-        //pizza_shown.push(pizza);
        showPizzaList(pizza_shown);
+       //Показати відфільтровані піци
    }else {showPizzaList(Pizza_List);}
 }
-    //Показати відфільтровані піци
- //   showPizzaList(pizza_shown);
-//}
+
 
 function initialiseMenu() {
     //Показуємо усі піци

@@ -2,6 +2,7 @@ var api = require('../API');
 var Storage = require('../LocalStorage');
 var MAP = require('../Maps');
 var Cart = require('./PizzaCart');
+var LiqPay = require('../buy');
 
 
 /* Name validation */
@@ -32,6 +33,7 @@ var phoneREGEX = /(\+38)?0\d{9}/;
 var phoneInput = $("#inputPhone");
 var phoneLabel = $(".label-phone");
 var phoneHint = $(".phoneHint");
+
 function checkPhone() {
     /*alert("check!");*/
     if (phoneInput.val().match(phoneREGEX)) {
@@ -78,7 +80,6 @@ function checkAdress() {
 function initialise() {
 
     $("#inputAdress").bind("input", function () {
-        //console.log(adressInput.val());
         MAP.geocodeAddress(adressInput.val(), function (err, coordinates) {
             if (err) {
                 console.log("Can't find adress")
@@ -109,17 +110,23 @@ function initialise() {
         checkAdress();
         if (checkName() && checkPhone() && checkAdress()) {
             console.log("Creating order!");
+            var pizzas=Cart.getPizzaInCart();
+            var pizzasLine="";
+            for(var i=0;i<pizzas.length;i++){
+                pizzasLine+="- "+pizzas[i].quantity+"шт. ["+(pizzas[i].size==='big_size'?"Велика":"Мала")+"] "+pizzas[i].pizza.title+";\n"
+            }
             api.createOrder({
                 name: nameInput.val(),
                 phone: phoneInput.val(),
-                adress: adressInput.val(),
-                pizzas: Cart.getPizzaInCart()
+                address: adressInput.val(),
+                costs: parseFloat($("#totalBuy").text().substr(0, $("#totalBuy").text().length-4)),
+                pizzas: pizzasLine
             }, function (err, res) {
 
                 if (err) {
                     console.log("There is an error")
                 } else {
-                    window.LiqPayCheckoutCallback = LiqPay.initialize(res.data, res.signature);
+                    window.LiqPayCheckoutCallback = LiqPay.create(res.data, res.signature);
                 }
             });
         } else {
@@ -139,7 +146,7 @@ function initialise() {
 
     });
 }
-
+window.onload = initialise;
 function setAdress(value) {
     adressInput.val(value);
 }

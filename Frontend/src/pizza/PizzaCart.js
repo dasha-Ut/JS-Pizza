@@ -2,7 +2,6 @@
  * Created by chaika on 02.02.16.
  */
 var Templates = require('../Templates');
-var Storage =window.localStorage;
 
 //Перелік розмірів піци
 var PizzaSize = {
@@ -12,67 +11,73 @@ var PizzaSize = {
 
 //Змінна в якій зберігаються перелік піц в кошику
 var Cart = [];
-
+var $order_number=$(".amount_of_orders");
 //HTML едемент куди будуть додаватися піци
 var $cart = $("#orderOne");
 
-var totalBuy = 0;
-var numberOfOrders = 0;
+
+var empty = "<div id=\"empty\">Пусто в холодильнику?<br>Замовте піцу!</div>";
 
 function addToCart(pizza, size) {
-    //Додавання однієї піци в кошик покупок
-    //Приклад реалізації, можна робити будь-яким іншим способом
-    function samePizza(obj) {
-        return obj.pizza.id === pizza.id && obj.size === size;
+
+    var exists=false;
+    if(Cart.length>0){
+        Cart.forEach(function(item){
+            if(item.pizza.id===pizza.id && item.size===size){
+                exists=true;
+                item.quantity++;
+            }
+        });
     }
-    var same = Cart.filter(samePizza);
-    if (same.length > 0) {
-        same[0].quantity++;
-    } else {
+    else{
+        $(".suma").prepend($(Templates.PizzaSum));
+        $("#buyPizza").prop('disabled', false);
+    }
+    //Приклад реалізації, можна робити будь-яким іншим способом
+    if(!exists) {
         Cart.push({
             pizza: pizza,
             size: size,
             quantity: 1
         });
-        numberOfOrders++;
-        updateOrderNumber();
+        localStorage.setItem(pizza.id+" "+size, JSON.stringify({
+            pizza: pizza,
+            size :size,
+            quantity:1
+        }));
     }
-    // Оновлюємо суму
-    totalBuy += pizza[size].price;
-    updateTotalSum();
+
+    //Оновити вміст кошика на сторінці
     updateCart();
-
-}
-
-function updateTotalSum(){
-    $("#totalBuy").html(totalBuy);
-    Storage.setItem("totalBuy",totalBuy);
-}
-
-function updateOrderNumber(){
-    $(".amount_of_orders").html(numberOfOrders);
-    Storage.setItem("numberOfOrders",numberOfOrders);
 }
 
 
 function removeFromCart(cart_item) {
     //Видалити піцу з кошика
-    Cart.splice(Cart.indexOf(cart_item), 1);
+    localStorage.removeItem(cart_item.pizza.id+" "+cart_item.size);
+    //TODO: треба зробити
+    for(var i=0, j=0;i<Cart.length;i++){
+        if(Cart[i]!==cart_item)Cart[j++]=Cart[i];
+    }
+    Cart.pop();
+    if(Cart.length===0){
+        $("#suma").remove();
+        $("#totalBuy").remove();
+    }
     //Після видалення оновити відображення
     updateCart();
 }
 
+
 function initialiseCart() {
-    //Фукнція віпрацьвуватиме при завантаженні сторінки
-    //Тут можна наприклад, зчитати вміст корзини який збережено в Local Storage то показати його
-    var saved = Storage.getItem("cart");
-    if (saved) {
-        Cart = saved;
-        totalBuy = Storage.getItem("total");
-        updateTotalSum();
-        numberOfOrders = Storage.getItem("numberOfOrders");
-        updateOrderNumber();
+    Object.keys(localStorage).forEach(function(key){
+        Cart.push(JSON.parse(localStorage.getItem(key)));
+    });
+    if(Cart.length>0){
+        $(".suma").prepend($(Templates.PizzaSum));
+        $("#buyPizza").prop('disabled', false);
     }
+
     updateCart();
 
 }
@@ -83,92 +88,78 @@ function getPizzaInCart() {
 }
 
 function updateCart() {
-    //Функція викликається при зміні вмісту кошика
-    //Тут можна наприклад показати оновлений кошик на екрані та зберегти вміт кошика в Local Storage
-
+    var sum=0;
     //Очищаємо старі піци в кошику
     $cart.html("");
 
+    $order_number.text(Cart.length);
     //Онволення однієї піци
     function showOnePizzaInCart(cart_item) {
         var html_code = Templates.PizzaCart_OneItem(cart_item);
 
         var $node = $(html_code);
 
-        $node.find(".plus").click(function () {
+        localStorage.setItem(cart_item.pizza.id+" "+cart_item.size, JSON.stringify(cart_item));
+
+        sum+=cart_item.pizza[cart_item.size].price * cart_item.quantity;
+
+        $node.find(".plus").click(function(){
             //Збільшуємо кількість замовлених піц
             cart_item.quantity += 1;
-
-            totalBuy += cart_item.pizza[cart_item.size].price;
-
             //Оновлюємо відображення
             updateCart();
-            updateTotalSum();
-
         });
-
-        $node.find(".minus").click(function () {
-            //Зменшуємо
-            if (cart_item.quantity == 1) {
-                removeFromCart(cart_item);
-                numberOfOrders--;
-
-                updateOrderNumber();
+        $node.find(".minus").click(function(){
+            //Збільшуємо кількість замовлених піц
+            if(cart_item.quantity===1)removeFromCart(cart_item);
+            else {
+                cart_item.quantity -= 1;
+                //Оновлюємо відображення
+                updateCart();
             }
-            cart_item.quantity -= 1;
-            totalBuy -= cart_item.pizza[cart_item.size].price;
-            //Оновлюємо відображення
-            updateCart();
-            updateTotalSum();
         });
-        $node.find(".delete").click(function () {
+        $node.find(".delete").click(function(){
             removeFromCart(cart_item);
-            totalBuy -= cart_item.pizza[cart_item.size].price * cart_item.quantity;
-            numberOfOrders--;
-            updateOrderNumber();
-            updateTotalSum();
-            //Оновлюємо відображення
-            updateCart();
-            updateTotal();
         });
 
         $cart.append($node);
-
     }
 
-    Cart.forEach(showOnePizzaInCart);
-    Storage.setItem("cart", Cart);
-    if (Cart.length === 0) {
-        $("#orderButt").attr("disabled", "disabled");
-    } else {
-        $("#orderButt").removeAttr("disabled");
+    if(Cart.length===0){
+        $cart.html(empty);
+        $("#buyPizza").prop('disabled', true);
+    }
+    else {
+        Cart.forEach(showOnePizzaInCart);
+        $("#totalBuy").text(sum + " грн");
     }
 }
-    $("#clear").click(function () {
-        clear();
-    });
 
+
+     $("#clear").click(function () {
+        clear();
+     });
     function clear(){
         Cart = [];
+        $("#suma").remove();
+        $("#totalBuy").remove();
+        localStorage.clear();
         updateCart();
-        totalBuy= 0;
-        updateTotalSum();
-        numberOfOrders = 0;
-        updateOrderNumber();
+
     }
 
 
-    $("#orderButt").click(function () {
-        if(Cart.length !== 0){
-            location.href="/order.html";
-        }
-    });
+     $("#orderButt").click(function () {
+         if(Cart.length !== 0){
+             location.href="/order.html";
+         }
+     });
 
-    $("#editButt").click(function () {
-        if(Cart.length !== 0){
-            location.href="/";
-        }
-    });
+     $("#editButt").click(function () {
+         if(Cart.length !== 0){
+             location.href="/";
+         }
+     });
 
 exports.removeFromCart = removeFromCart;
 exports.addToCart = addToCart;
@@ -178,4 +169,3 @@ exports.initialiseCart = initialiseCart;
 
 exports.PizzaSize = PizzaSize;
 exports.getPizzaInCart = getPizzaInCart;
-//exports.clear = clear;

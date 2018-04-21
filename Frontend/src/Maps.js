@@ -103,7 +103,7 @@ var styledMapType = new google.maps.StyledMapType(
         {
             featureType: 'water',
             elementType: 'geometry.fill',
-            stylers: [{color: '#37afff'}]
+            stylers: [{color: '#65dbff'}]
         },
         {
             featureType: 'water',
@@ -112,7 +112,6 @@ var styledMapType = new google.maps.StyledMapType(
         }
     ],
     {name: 'Pizza Map'});
-
 
 var map;
 var directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers:true});
@@ -163,6 +162,7 @@ function initialize() {
     });
 }
 
+google.maps.event.addDomListener(window,'load',initialize);
 function geocodeLatLng(latlng, callback) {
     var geocoder = new google.maps.Geocoder();
     geocoder.geocode({'location': latlng}, function (results, status) {
